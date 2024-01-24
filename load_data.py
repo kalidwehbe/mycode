@@ -240,12 +240,13 @@ def student_failures_list(file_name, failures):
                 student["G3"] = int(student["G3"])
 
         return students
+    
+
 #==========================================#
 # Place your load_data function after this line
 
-
 def load_data(file_name, tup_category: tuple):
-    
+
 
     """
     Based on user input the function displays the students that follow the 
@@ -285,9 +286,7 @@ def load_data(file_name, tup_category: tuple):
             for line in lines[1:]:
 
                 row = line.strip().split(',')
-                
-                print(row)
-                
+
                 student = {}
 
                 for i in range(len(row)):
@@ -295,38 +294,53 @@ def load_data(file_name, tup_category: tuple):
                     
                     student[header[i]] = row[i]
 
-            students.append(student)
+                students.append(student)
+
+
+                student["Age"] = int(student["Age"])
+                student["StudyTime"] = int(student["StudyTime"])
+                student["Health"] = int(student["Health"])
+                student["Failures"] = int(student["Failures"])
+                student["Absences"] = int(student["Absences"])
+                student["G1"] = int(student["G1"])
+                student["G2"] = int(student["G2"])
+                student["G3"] = int(student["G3"])
+
+
             
-            student["Age"] = int(student["Age"])
-            student["StudyTime"] = int(student["StudyTime"])
-            student["Health"] = int(student["Health"])
-            student["Failures"] = int(student["Failures"])
-            student["Absences"] = int(student["Absences"])
-            student["G1"] = int(student["G1"])
-            student["G2"] = int(student["G2"])
-            student["G3"] = int(student["G3"])
 
 
-    if tup_category[0] == "School":
 
-        student_school_list(file_name, tup_category[1])
+    elif tup_category[0] == "School":
 
-    if tup_category[0] == "Age":
+        students = student_school_list(file_name, tup_category[1])
 
-        student_age_list(file_name, int(tup_category[1]))
 
-    if tup_category[0] == "Failures":
 
-        student_failures_list(file_name, int(tup_category[1]))
+    elif tup_category[0] == "Age":
 
-    if tup_category[0] == "Health":
+        students = student_age_list(file_name, int(tup_category[1]))
 
-        student_health_list(file_name, int(tup_category[1]))
+
+
+    elif tup_category[0] == "Failures":
+
+        students = student_failures_list(file_name, int(tup_category[1]))
+
+
+
+    elif tup_category[0] == "Health":
+
+        students = student_health_list(file_name, int(tup_category[1]))
+
+    else:
+
+        print("Invalid value") # message on the termnal asked for in the lab
 
     return students
 
+# user input
 
-print(load_data("student-mat.csv", ("All", -1)))
 #==========================================#
 # Place your add_average function after this line
 
@@ -353,24 +367,30 @@ def add_average(students):
     
     
     """
+    
+    if len(students) == 0:
+
+        return []
 
     for student in students:
-
+        
         avg_grade = (student['G1'] + student['G2'] + student['G3']) / 3
 
         student['G_avg'] = round(avg_grade, 2)
+        if "Age" in students:
+            student["Age"] = int(student["Age"])
+        if "StudyTime" in students:
+            student["StudyTime"] = int(student["StudyTime"])
+        if "Failures" in students:
+            student["Failures"] = int(student["Failures"])
+        if "Health" in students:
+            student["Health"] = int(student["Health"])
         
-        student["Age"] = int(student["Age"])
-        student["StudyTime"] = int(student["StudyTime"])
-        student["Failures"] = int(student["Failures"])
-        student["Health"] = int(student["Health"])
         student["Absences"] = int(student["Absences"])
         student["G1"] = int(student["G1"])
         student["G2"] = int(student["G2"])
         student["G3"] = int(student["G3"])
-        student["G_avg"] = int(student["G_avg"])
-        
+        student["G_avg"] = float(student["G_avg"])
 
-        return students
+    return students
     
-
