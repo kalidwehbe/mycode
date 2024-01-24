@@ -1,192 +1,307 @@
 /********* main.c ********
-
     Student Name 	= Kalid Wehbe
     Student Number	= 101259994
 */
 
+// Includes go here
+#include <stdlib.h>
 #include <stdio.h>
-#include "a1_data_structures.h"
-#include "a1_functions.h"
+#include <string.h>
+#include <stdbool.h>
+#include "a2_nodes.h"
+#include "a2_functions.h"
+
 int main()
 {
+    /******** DONT MODIFY THIS PART OF THE CODE ********/
+    /* THIS CODE WILL LOAD THE DATABASE OF USERS FROM THE FILE
+       AND GENERATE THE STARTING LINKED LIST.
+    */
+    FILE *csv_file = fopen("user_details.csv", "r");
+    if (csv_file == NULL)
+    {
+        perror("Error opening the CSV file");
+        return 1;
+    }
+    // Parse CSV data and create users
+    user_t *users = read_CSV_and_create_users(csv_file, 50);
 
-    //Printing out the introduction and asking the user to input the correct details
+    fclose(csv_file);
+    /******** DONT MODIFY THIS PART OF THE CODE ********/
 
-    printf("Welcome to ABC Project Tracker\n");
-    printf("Enter total project's budget: ");
+    /* IMPORTANT: You must use the users linked list created in the code above.
+                  Any new users should be added to that linked list.
+    */
 
-    milestone_t project_info;
+    // Your solution goes here
 
-    project_info.cost = get_input_f();
+    // Introduction to the program
+    printf("**********************************\n");
+    printf("Welcome to Text-Based Facebook  \n");
+    printf("**********************************\n");
 
-    printf("Enter total project's duration in weeks: ");
-    project_info.time = get_input_f();
+    // Prints out the menu
 
-    //finding out the amount of employees needed 
-
-    number_of_employees(&project_info);
-
-    printf("\n");
-
-    //making a array for the milestones and innitializing them
-    milestone_t milestones[6];
-
-    milestones[0].cost = project_info.cost;
-    milestones[0].time = project_info.time;
-    milestones[0].completed = 0;
-
-    char stage_one[] = "Technical requirements";
-    milestones[1] = init_milestone(stage_one, project_info.cost);
-    char stage_two[] = "System Desigm";
-    milestones[2] = init_milestone(stage_two, project_info.cost);
-    char stage_three[] = "Software Development";
-    milestones[3] = init_milestone(stage_three, project_info.cost);
-    char stage_four[] = "Testing";
-    milestones[4] = init_milestone(stage_four, project_info.cost);
-    char stage_five[] = "Product release";
-    milestones[5] = init_milestone(stage_five, project_info.cost);
-
-    //printing the menu for the user and allowing him to choose an otion
-
-    printf("--------------------------\n");
-    printf("\n");
     print_menu();
-    printf("\n");
-    printf("Your choice is: ");
-    int choice;
-    int exit_flag = 0;
-    choice = get_input_usi();
-    printf("\n");
 
-    //while the exit_flag isn't raised then continue this loop
-    while (!exit_flag)
+    // storing user input
+
+    int option;
+
+    scanf("%d", &option);
+
+    // while loop if the option is invalid
+
+    while (option > 6 || option < 1)
     {
 
+        printf("Invalid choice. Please try again.\n");
 
-        while (choice < 0 || choice > 5)
+        // reprints menu and asks for option again
+
+        print_menu();
+
+        scanf("%d", &option);
+    }
+    while (option <= 6 && option >= 1)
+    {
+
+        if (option == 1)
         {
-            printf("----------------------------------------\n");
-            printf("The value you entered is wrong\n");
-            printf("Enter a value between 0 and 5: ");
-            choice = get_input_usi();
-            printf('\n');
+
+            char username[30];
+            char password[16];
+
+            printf("Enter your username: ");
+            scanf("%29s", username);
+
+            printf("Enter an up to 15 character password: ");
+            scanf("%15s", password);
+
+            add_user(users, username, password);
         }
-        if (choice > 0 && choice <= 5)
-        {
-            printf("--------------Milestone Stats------------\n");
-            printf("Below is \"%s\" current stats\n", milestones[choice].name);
-            printf("-----------------------------------------\n");
-            print_stats(milestones[choice]);
 
-            if (milestones[choice].completed == 1)
+        if (option == 2)
+        {
+
+            char username[30];
+
+            printf("Enter username to update there password: ");
+            scanf("%29s", username);
+
+            user_t *if_found = find_user(users, username);
+
+            if (if_found != NULL)
             {
 
-                printf("%s is complete \n", milestones[choice].name);
-                printf("cannot be updated\n");
+                char password[30];
+                printf("Enter a new password that is up to 15 characters: ");
+                scanf("%29s", password);
+
+                printf("Old password: %s\n", if_found->password);
+                strncpy(if_found->password, password, sizeof(if_found->password));
+                printf("New password: %s\n", if_found->password);
             }
             else
             {
-                printf("------------Update Stats--------------\n");
-                update_stats(milestones, choice);
-                printf("Stats updated!\n");
-                printf("--------------Milestone Stats------------\n");
-                printf("Below is '%s' current stats\n", milestones[choice].name);
-                printf("-----------------------------------------\n");
-                print_stats(milestones[choice]);
+                printf("-------------------------------------\n");
+                printf("           User not found.           \n");
+                printf("-------------------------------------\n");
             }
-            printf("--------------------------\n");
-            print_menu();
-            printf("Your choice is: ");
-            choice = get_input_usi();
         }
-        if (choice == 0)
+
+        if (option == 3)
         {
 
-            check_project_completion(milestones, sizeof(milestones) / sizeof(milestones[0]));
+            char username[30];
+            printf("Enter username to manage their posts: ");
+            scanf("%29s", username);
 
-            if (milestones[0].completed == 0)
+            user_t *if_found_posts = find_user(users, username);
+
+            display_user_posts(if_found_posts);
+
+            if (if_found_posts != NULL)
             {
 
-                printf("-----------------------------------------------\n");
-                printf("------------Project's Preformance---------------\n");
-                printf("-----------------------------------------------\n");
-                printf("---------------Milestones Stats------------------\n");
-                printf("Below is \"Planned Details\" current stats\n");
-                printf("-----------------------------------------------\n");
-                print_stats(milestones[choice]);
-                printf("Do you want to finish the remaining milestones? (Y/N)");
-                while (1)
+                printf("1. Add a new user post\n");
+                printf("2. Remove a users post\n");
+                printf("3. Return to main menu\n\n");
+
+                int choice_posts = 0;
+                printf("Your choice: ");
+                scanf("%d", &choice_posts);
+
+                while (choice_posts >= 1 && choice_posts <= 3)
                 {
-                    char letter;
-                    scanf(" %c", &letter); // Read a single character
-
-                    if (letter == 'Y' || letter == 'y')
+                    if (choice_posts == 1)
                     {
-                        // Perform action for 'Y'
-                        printf("You chose to proceed. Performing action for 'Y'.\n");
 
-                        printf("--------------------------\n");
-                        print_menu();
+                        char sentence[250]; // Assuming the sentence won't be longer than 250 characters
 
-                        printf("Your choice is: ");
-                        choice = get_input_usi();
+                        printf("Enter your post content: ");
 
-                        break; // Exit the inner loop
+                        scanf(" %[^\n]s", sentence);
+
+                        printf("Post added to your profile.");
+
+                        add_post(if_found_posts, sentence);
+
+                        printf("--------------------------------------");
+
+                        printf("\n");
+
+                        display_user_posts(if_found_posts);
                     }
-                    else if (letter == 'N' || letter == 'n')
+                    else if (choice_posts == 2)
                     {
-                        int total_cost = milestones[1].cost + milestones[2].cost + milestones[3].cost + milestones[4].cost + milestones[5].cost;
-                        if (milestones[0].cost > total_cost)
+                        printf("Which post do you want to delete? ");
+
+                        int numPost;
+
+                        scanf("%d", &numPost);
+
+                        bool did_it_delete = delete_post(if_found_posts, numPost);
+
+                        if (did_it_delete == true)
                         {
 
-                            printf("The project's cost is below budget!\n");
-                            printf("Planned budget: %.2f\n", milestones[0].cost);
-                            printf("Actual Cost: %d\n", total_cost);
+                            printf("Post %d was deleted successfully!", numPost);
+
+                            display_user_posts(if_found_posts);
                         }
                         else
                         {
 
-                            printf("The project's cost is over budget!\n");
-                            printf("Planned budget: %.2f\n", milestones[0].cost);
-                            printf("Actual Cost: %d\n", total_cost);
+                            printf("Invalid post's number\n");
+
+                            break;
                         }
-                        printf("The program will quit now! Goodbye!\n");
-                        printf("Process exited with status 0\n");
-                        exit_flag = 1;
+                    }
+                    else if (choice_posts == 3)
+                    {
                         break;
                     }
-                    else
-                    {
-                        printf("Invalid input. Please enter 'Y' or 'N': ");
-                    }
+
+                    printf("1. Add a new user post\n");
+                    printf("2. Remove a users post\n");
+                    printf("3. Return to main menu\n\n");
+
+                    printf("Your choice: ");
+                    scanf("%d", &choice_posts);
                 }
-            }else{
-                
-                printf("--------------Final Project's Performance-------------------\n");
-                int total_cost = milestones[1].cost + milestones[2].cost + milestones[3].cost + milestones[4].cost;
-                if (milestones[0].cost > total_cost)
-                {
-
-                    printf("The project's cost is below budget!\n");
-                    printf("Planned budget: %.2f\n", milestones[0].cost);
-                    printf("Actual Cost: %d\n", total_cost);
-                }
-                else
-                {
-
-                    printf("The project's cost is over budget!\n");
-                    printf("Planned budget: %.2f\n", milestones[0].cost);
-                    printf("Actual Cost: %d\n", total_cost);
-                }
-
-                printf("The program will quit now! Goodbye!\n");
-                printf("Process exited with status 0\n");
-
-                break;
-
-
-
             }
+        }
+
+        if (option == 4)
+        {
+
+            char username[30];
+
+            printf("Enter username to manage their friends: ");
+
+            scanf("%29s", username);
+
+            user_t *if_found_user = find_user(users, username);
+
+            if (if_found_user != NULL)
+            {
+
+                printf("-------------------------------------\n");
+                printf("           %s's friends        \n", username);
+                printf("-------------------------------------\n");
+                printf("\n");
+                printf("1. Display all user's friends\n");
+                printf("2. Add a new friend\n");
+                printf("3. Delete a friend\n");
+                printf("4. Return to main menu\n");
+
+                printf("Your choice: ");
+                int choice_friend;
+                scanf("%d", &choice_friend);
+
+                while (choice_friend >= 1 && choice_friend <= 4)
+                {
+
+                    if (choice_friend == 1)
+                    {
+
+                        display_user_friends(if_found_user);
+                    }
+                    if (choice_friend == 2)
+                    {
+
+                        char friend[30];
+                        printf("Enter a new friends' name: ");
+                        scanf("%29s", friend);
+                        add_friend(if_found_user, friend);
+                    }
+                    if (choice_friend == 3)
+                    {
+
+                        char friend[30];
+                        printf("Enter a new friends' name: ");
+                        scanf("%29s", friend);
+
+                        bool did_it_delete = delete_friend(if_found_user, friend);
+                        if (did_it_delete == true)
+                        {
+
+                            display_user_friends(if_found_user);
+                        }
+                    }
+                    if (choice_friend == 4)
+                    {
+
+                        break;
+                    }
+
+                    printf("\n");
+                    printf("------------------------------\n");
+
+                    printf("1. Display all user's friends\n");
+                    printf("2. Add a new friend\n");
+                    printf("3. Delete a friend\n");
+                    printf("4. Return to main menu\n");
+
+                    printf("Your choice: ");
+                    scanf("%d", &choice_friend);
+                }
+            }
+            else
+            {
+
+                printf("-------------------------------------\n");
+                printf("           User not found.           \n");
+                printf("-------------------------------------\n");
+            }
+        }
+        if (option == 5)
+        {
+
+            display_all_posts(users);
+        }
+        if (option == 6)
+        {
+
+            printf("************************\n");
+            printf("Thank you for using \nText-Based Facebook Bye!");
+            printf("************************\n");
+            teardown(users);
+            return 0;
+        }
+        print_menu();
+        scanf("%d", &option);
+        while (option > 6 || option < 1)
+        {
+
+            printf("Invalid choice. Please try again.\n");
+
+            // reprints menu and asks for option again
+
+            print_menu();
+
+            scanf("%d", &option);
         }
     }
 }
